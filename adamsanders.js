@@ -11,10 +11,17 @@ if (process.argv.length < 5) {
 }
 
 var startTime = new Date();
-var counts = {};
-function processTransaction(item) {
+var frequentItemset = {};
+var processTransaction = item => {
 	if (parseInt(item))
-		counts[item] = counts[item]+1 || 1;
+		frequentItemset[item] = frequentItemset[item]+1 || 1;
+}
+
+var pruneItemset = () => {
+	for (itemset in frequentItemset) {
+		if (frequentItemset[itemset] < process.argv[3])
+			delete frequentItemset[itemset];
+	}
 }
 
 var readFd = fs.openSync(process.argv[2], 'r');
@@ -25,6 +32,7 @@ var statResult = fs.fstatSync(readFd);
 var inputBuf = Buffer.alloc(statResult.size);
 var bytesRead = fs.readSync(readFd, inputBuf, 0, inputBuf.length, 0);
 var readChar = '', activeNum = '';
+
 
 // Find frequent 1-itemsets, C1
 for (i = 0; i < bytesRead; i++) {
@@ -39,19 +47,19 @@ for (i = 0; i < bytesRead; i++) {
 		activeNum += readChar;
 }
 
-// Prune C1 for the minimum support
-for (itemset in counts) {
-	if (counts[itemset] < process.argv[3])
-		delete counts[itemset];
-}
+pruneItemset();
 
+while (false) {
+	
+	pruneItemset();
+}
 
 
 // Write frequent itemsets to output file
 var formattedString;
-for (itemset in counts) {
+for (itemset in frequentItemset) {
 	
-	formattedString = itemset + ' (' + counts[itemset] + ')\n';
+	formattedString = itemset + ' (' + frequentItemset[itemset] + ')\n';
 	fs.writeSync(writeFd, formattedString);
 }
 
