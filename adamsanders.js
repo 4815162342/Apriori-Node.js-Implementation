@@ -60,28 +60,27 @@ while (true) {
 	}
 	
 	// Find frequent k-itemsets, Ck
-	for (set in candidates) {
+	let activeLine = '';
+	for (i = 0; i < inputByteSize; i++) {
+		readChar = String.fromCharCode(inputBuf.readUInt8(i));
 		
-		let activeLine = '', setArray = set.split(' ');
-		for (i = 0; i < inputByteSize; i++) {
-			readChar = String.fromCharCode(inputBuf.readUInt8(i));
-			
-			if (readChar == '\n') {
+		if (readChar == '\n') {
+			for (set in candidates) {
+				setArray = set.split(' ');
 				if (setArray.every(cur => activeLine.indexOf(cur) >= 0))
 					processTransaction(frequentItemsets.length - 1, set);
-				
-				activeLine = '';
 			}
 			
-			else
-				activeLine += readChar;
+			activeLine = '';
 		}
-		console.log('done w/ set', set);
+		
+		else
+			activeLine += readChar;
 	}
 	
 	pruneItemset(frequentItemsets.length - 1);
 	
-	if (Object.keys(frequentItemsets[frequentItemsets.length - 1]).length <= 1 || frequentItemsets.length > 5)
+	if (Object.keys(frequentItemsets[frequentItemsets.length - 1]).length <= 1)
 		break;
 }
 
