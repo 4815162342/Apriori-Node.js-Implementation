@@ -1,16 +1,13 @@
 //THIS CODE IS MY OWN WORK, IT WAS WRITTEN WITHOUT CONSULTING A TUTOR OR CODE WRITTEN BY OTHER STUDENTS - Adam Sanders
 
 var fs = require('fs');
-var readline = require('readline');
-var stream = require('stream');
-
 
 if (process.argv.length < 5) {
 	console.log("\nPlease input three parameters: 1) name of dataset, 2) threshold minimum, and 3) name of the output file\n\n");
 	return;
 }
 
-var startTime = new Date();
+const startTime = new Date();
 var frequentItemset = {};
 var processTransaction = item => {
 	if (parseInt(item))
@@ -24,10 +21,10 @@ var pruneItemset = () => {
 	}
 }
 
-var readFd = fs.openSync(process.argv[2], 'r');
-var writeFd = fs.openSync(process.argv[4], 'w');
+const readFd = fs.openSync(process.argv[2], 'r');
+const writeFd = fs.openSync(process.argv[4], 'w');
 
-var statResult = fs.fstatSync(readFd);
+const statResult = fs.fstatSync(readFd);
 
 var inputBuf = Buffer.alloc(statResult.size);
 var bytesRead = fs.readSync(readFd, inputBuf, 0, inputBuf.length, 0);
@@ -49,7 +46,11 @@ for (i = 0; i < bytesRead; i++) {
 
 pruneItemset();
 
-while (false) {
+while (true) {
+	let 
+	for (itemset in frequentItemset) {
+		
+	}
 	
 	pruneItemset();
 }
