@@ -49,16 +49,22 @@ for (i = 0; i < bytesRead; i++) {
 pruneItemset(frequentItemsets.length - 1);
 
 
-while (false) {
+var singleItemsetArray = Object.entries(frequentItemsets[0]);
+while (true) {
 	let frequentArray = Object.entries(frequentItemsets[frequentItemsets.length - 1]);
+	frequentItemsets.push({});
+	
 	for (i = 0; i < frequentArray.length; i++) {
-		for (j = i+1; j < frequentArray.length; j++) {
-			processTransaction(`${frequentArray[i][0]} ${frequentArray[j][0]}`);
+		for (j = i + 1; j < singleItemsetArray.length; j++) {
+			console.log(`${frequentArray[i][0]} ${singleItemsetArray[j][0]}`);
+			processTransaction(frequentItemsets.length - 1, `${frequentArray[i][0]} ${singleItemsetArray[j][0]}`);
 		}
 	}
 	
-	//pruneItemset();
-	break;
+	//pruneItemset(frequentItemsets.length - 1);
+	
+	if (Object.keys(frequentItemsets[frequentItemsets.length - 1]).length <= 1 || frequentItemsets.length > 5)
+		break;
 }
 
 
