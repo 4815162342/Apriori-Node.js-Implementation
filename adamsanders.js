@@ -29,12 +29,12 @@ const writeFd = fs.openSync(process.argv[4], 'w');
 const statResult = fs.fstatSync(readFd);
 
 var inputBuf = Buffer.alloc(statResult.size);
-var bytesRead = fs.readSync(readFd, inputBuf, 0, inputBuf.length, 0);
+var inputByteSize = fs.readSync(readFd, inputBuf, 0, inputBuf.length, 0);
 var readChar = '', activeNum = '';
 
 
 // Find frequent 1-itemsets, C1
-for (i = 0; i < bytesRead; i++) {
+for (i = 0; i < inputByteSize; i++) {
 	readChar = String.fromCharCode(inputBuf.readUInt8(i));
 	
 	if (readChar == ' ' || readChar == '\n') {
@@ -51,17 +51,34 @@ pruneItemset(frequentItemsets.length - 1);
 
 var singleItemsetArray = Object.entries(frequentItemsets[0]);
 while (true) {
-	let frequentArray = Object.entries(frequentItemsets[frequentItemsets.length - 1]);
+	let frequentArray = Object.entries(frequentItemsets[frequentItemsets.length - 1]), candidates = {};
 	frequentItemsets.push({});
 	
 	for (i = 0; i < frequentArray.length; i++) {
-		for (j = i + 1; j < singleItemsetArray.length; j++) {
-			console.log(`${frequentArray[i][0]} ${singleItemsetArray[j][0]}`);
-			processTransaction(frequentItemsets.length - 1, `${frequentArray[i][0]} ${singleItemsetArray[j][0]}`);
+		for (j = i + 1; j < singleItemsetArray.length; j++)
+			candidates[`${frequentArray[i][0]} ${singleItemsetArray[j][0]}`] = 0;
+	}
+	
+	// Find frequent k-itemsets, Ck
+	for (set in candidates) {
+		
+		let activeLine = '', setArray = set.split(' ');
+		for (i = 0; i < inputByteSize; i++) {
+			readChar = String.fromCharCode(inputBuf.readUInt8(i));
+			
+			if (readChar == '\n') {
+				if (setArray.every(cur => activeLine.indexOf(cur) >= 0))
+					processTransaction(frequentItemsets.length - 1, set);
+				
+				activeLine = '';
+			}
+			
+			else
+				activeLine += readChar;
 		}
 	}
 	
-	//pruneItemset(frequentItemsets.length - 1);
+	pruneItemset(frequentItemsets.length - 1);
 	
 	if (Object.keys(frequentItemsets[frequentItemsets.length - 1]).length <= 1 || frequentItemsets.length > 5)
 		break;
