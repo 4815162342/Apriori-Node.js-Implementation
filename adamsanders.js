@@ -76,6 +76,7 @@ while (true) {
 			else
 				activeLine += readChar;
 		}
+		console.log('done w/ set', set);
 	}
 	
 	pruneItemset(frequentItemsets.length - 1);
