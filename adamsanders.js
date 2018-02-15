@@ -7,19 +7,21 @@ if (process.argv.length < 5) {
 	return;
 }
 
-const startTime = new Date();
-var frequentItemset = {};
-var processTransaction = item => {
-	if (parseInt(item))
+// Helper functions
+const processTransaction = item => {
+	if (item)
 		frequentItemset[item] = frequentItemset[item]+1 || 1;
 }
 
-var pruneItemset = () => {
+const pruneItemset = () => {
 	for (itemset in frequentItemset) {
 		if (frequentItemset[itemset] < process.argv[3])
 			delete frequentItemset[itemset];
 	}
 }
+
+const startTime = new Date();
+var frequentItemset = {};
 
 const readFd = fs.openSync(process.argv[2], 'r');
 const writeFd = fs.openSync(process.argv[4], 'w');
@@ -47,12 +49,15 @@ for (i = 0; i < bytesRead; i++) {
 pruneItemset();
 
 while (true) {
-	let 
-	for (itemset in frequentItemset) {
-		
+	let frequentArray = Object.entries(frequentItemset);
+	for (i = 0; i < frequentArray.length; i++) {
+		for (j = i+1; j < frequentArray.length; j++) {
+			processTransaction(`${frequentArray[i][0]} ${frequentArray[j][0]}`);
+		}
 	}
 	
-	pruneItemset();
+	//pruneItemset();
+	break;
 }
 
 
