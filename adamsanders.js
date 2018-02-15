@@ -8,20 +8,20 @@ if (process.argv.length < 5) {
 }
 
 // Helper functions
-const processTransaction = item => {
+const processTransaction = (index, item) => {
 	if (item)
-		frequentItemset[item] = frequentItemset[item]+1 || 1;
+		frequentItemsets[index][item] = frequentItemsets[index][item]+1 || 1;
 }
 
-const pruneItemset = () => {
-	for (itemset in frequentItemset) {
-		if (frequentItemset[itemset] < process.argv[3])
-			delete frequentItemset[itemset];
+const pruneItemset = i => {
+	for (itemset in frequentItemsets[i]) {
+		if (frequentItemsets[i][itemset] < process.argv[3])
+			delete frequentItemsets[i][itemset];
 	}
 }
 
 const startTime = new Date();
-var frequentItemset = {};
+var frequentItemsets = [{}];
 
 const readFd = fs.openSync(process.argv[2], 'r');
 const writeFd = fs.openSync(process.argv[4], 'w');
@@ -38,7 +38,7 @@ for (i = 0; i < bytesRead; i++) {
 	readChar = String.fromCharCode(inputBuf.readUInt8(i));
 	
 	if (readChar == ' ' || readChar == '\n') {
-		processTransaction(activeNum);
+		processTransaction(frequentItemsets.length - 1, activeNum);
 		activeNum = '';
 	}
 	
@@ -46,10 +46,11 @@ for (i = 0; i < bytesRead; i++) {
 		activeNum += readChar;
 }
 
-pruneItemset();
+pruneItemset(frequentItemsets.length - 1);
 
-while (true) {
-	let frequentArray = Object.entries(frequentItemset);
+
+while (false) {
+	let frequentArray = Object.entries(frequentItemsets[frequentItemsets.length - 1]);
 	for (i = 0; i < frequentArray.length; i++) {
 		for (j = i+1; j < frequentArray.length; j++) {
 			processTransaction(`${frequentArray[i][0]} ${frequentArray[j][0]}`);
@@ -63,11 +64,14 @@ while (true) {
 
 // Write frequent itemsets to output file
 var formattedString;
-for (itemset in frequentItemset) {
+frequentItemsets.forEach(set => {
 	
-	formattedString = itemset + ' (' + frequentItemset[itemset] + ')\n';
-	fs.writeSync(writeFd, formattedString);
-}
+	for (itemset in set) {
+		
+		formattedString = itemset + ' (' + set[itemset] + ')\n';
+		fs.writeSync(writeFd, formattedString);
+	}
+});
 
 var endTime = new Date();
 console.log('Apriori completed in', endTime - startTime, 'milliseconds');
